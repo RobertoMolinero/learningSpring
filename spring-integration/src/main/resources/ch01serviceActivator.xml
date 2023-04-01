@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:int="http://www.springframework.org/schema/integration"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration-4.2.xsd">
+
+   <!-- Endpoint -->
+   <int:gateway service-interface="sec00introduction.ch01serviceActivator.CustomGateway" default-request-channel="inputChannel">
+      <int:method name="print"/>
+   </int:gateway>
+
+   <!-- Channel -->
+   <int:channel id="inputChannel">
+      <int:dispatcher failover="false" load-balancer="round-robin"/>
+   </int:channel>
+
+   <!-- Endpoint -->
+   <int:service-activator order="1" ref="incorrectPrintService" input-channel="inputChannel" method="print"/>
+   <int:service-activator order="2" ref="printService" input-channel="inputChannel" method="print"/>
+   <int:service-activator order="3" ref="uppercasePrintService" input-channel="inputChannel" method="print"/>
+
+   <!-- Spring Bean -->
+   <bean id="printService" class="sec00introduction.ch01serviceActivator.PrintService"/>
+   <bean id="uppercasePrintService" class="sec00introduction.ch01serviceActivator.UppercasePrintService"/>
+   <bean id="incorrectPrintService" class="sec00introduction.ch01serviceActivator.IncorrectPrintService"/>
+
+   <!--  Spring Bean -->
+   <bean id="reversePrintService" class="sec00introduction.ch01serviceActivator.ReversePrintService"/>
+</beans>

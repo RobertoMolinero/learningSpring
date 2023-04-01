@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:int="http://www.springframework.org/schema/integration"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration-4.2.xsd">
+
+   <!-- Endpoint -->
+   <int:gateway service-interface="sec04processingEndpoints.ch20serviceActivatorAdvanced.PrinterGateway" default-request-channel="inputChannel"/>
+
+   <int:channel id="inputChannel"/>
+   <int:channel id="outputChannel"/>
+
+   <int:service-activator ref="uppercaseService" method="execute" input-channel="inputChannel"/>
+   <bean id="uppercaseService" class="sec04processingEndpoints.ch20serviceActivatorAdvanced.UppercaseService"/>
+
+   <!-- Endpoint -->
+   <int:service-activator ref="printService" input-channel="outputChannel" method="print"/>
+
+   <!-- Spring Bean -->
+   <bean id="printService" class="sec04processingEndpoints.ch20serviceActivatorAdvanced.PrintService"/>
+</beans>

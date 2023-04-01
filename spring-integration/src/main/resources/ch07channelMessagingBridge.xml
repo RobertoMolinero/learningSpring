@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:int="http://www.springframework.org/schema/integration"
+       xmlns:task="http://www.springframework.org/schema/task"
+       xsi:schemaLocation="http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-4.2.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration-4.2.xsd">
+
+   <!-- Endpoint -->
+   <int:gateway service-interface="sec01channels.ch07channelMessagingBridge.CustomGateway" default-request-channel="pollableChannel">
+      <int:method name="print"/>
+   </int:gateway>
+
+   <int:channel id="pollableChannel">
+      <int:queue capacity="10"/>
+   </int:channel>
+
+   <int:bridge input-channel="pollableChannel" output-channel="inputChannel">
+      <int:poller fixed-delay="5" time-unit="SECONDS" max-messages-per-poll="2">
+      </int:poller>
+   </int:bridge>
+
+   <!-- Task Executor -->
+   <task:executor id="executor" pool-size="5"/>
+
+   <!-- Channel -->
+   <int:publish-subscribe-channel id="inputChannel" ignore-failures="true" task-executor="executor"/>
+
+   <!-- Endpoint -->
+   <int:service-activator order="1" ref="printService" input-channel="inputChannel" method="print"/>
+   <int:service-activator order="2" ref="uppercasePrintService" input-channel="inputChannel" method="print"/>
+
+   <!-- Spring Bean -->
+   <bean id="printService" class="sec01channels.ch07channelMessagingBridge.PrintService"/>
+   <bean id="uppercasePrintService" class="sec01channels.ch07channelMessagingBridge.UppercasePrintService"/>
+</beans>

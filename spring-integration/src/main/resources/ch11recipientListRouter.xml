@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:int="http://www.springframework.org/schema/integration"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration-4.2.xsd">
+
+   <!-- Endpoint -->
+   <int:gateway service-interface="sec02endpoints.ch11recipientListRouter.PrinterGateway" default-request-channel="inputChannel"/>
+
+   <int:recipient-list-router input-channel="inputChannel" default-output-channel="defaultChannel">
+      <int:recipient channel="stringChannel"/>
+      <int:recipient channel="integerChannel"/>
+      <!-- to trigger the defaultChannel: selector-expression="payload.equals(42)" -->
+   </int:recipient-list-router>
+
+   <!-- Channel -->
+   <int:channel id="inputChannel"/>
+   <int:channel id="defaultChannel"/>
+
+   <!-- Endpoint -->
+   <int:service-activator ref="printService" input-channel="stringChannel" method="print"/>
+   <int:service-activator ref="numericPrintService" input-channel="integerChannel" method="print"/>
+   <int:service-activator ref="defaultPrintService" input-channel="defaultChannel" method="print"/>
+
+   <!-- Spring Bean -->
+   <bean id="printService" class="sec02endpoints.ch11recipientListRouter.PrintService"/>
+   <bean id="numericPrintService" class="sec02endpoints.ch11recipientListRouter.NumericPrintService"/>
+   <bean id="defaultPrintService" class="sec02endpoints.ch11recipientListRouter.DefaultPrintService"/>
+</beans>

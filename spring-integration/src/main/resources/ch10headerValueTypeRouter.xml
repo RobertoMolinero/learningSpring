@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:int="http://www.springframework.org/schema/integration"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration-4.2.xsd">
+
+   <!-- Endpoint -->
+   <int:gateway service-interface="sec02endpoints.ch10headerValueTypeRouter.PrinterGateway" default-request-channel="inputChannel"/>
+
+   <int:header-value-router input-channel="inputChannel" header-name="routeHeader" default-output-channel="stringChannel">
+      <int:mapping value="A" channel="stringChannel"/>
+      <int:mapping value="B" channel="integerChannel"/>
+   </int:header-value-router>
+
+   <!-- Channel -->
+   <int:channel id="inputChannel"/>
+
+   <!-- Endpoint -->
+   <int:service-activator ref="printService" input-channel="stringChannel" method="print"/>
+   <int:service-activator ref="numericPrintService" input-channel="integerChannel" method="print"/>
+
+   <!-- Spring Bean -->
+   <bean id="printService" class="sec02endpoints.ch10headerValueTypeRouter.PrintService"/>
+   <bean id="numericPrintService" class="sec02endpoints.ch10headerValueTypeRouter.NumericPrintService"/>
+</beans>
